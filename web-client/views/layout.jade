@@ -7,4 +7,38 @@ html
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js')
     script(src='//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js')
   body
+    div.navbar.navbar-inverse.navbar-fixed-top
+      div.container
+        div.navbar-header
+          button.navbar-toggle(type="button", data-toggle="collapse", data-target=".navbar-collapse")
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.navbar-brand(href="#") Transitr
+        div.navbar-collapse.collapse
+          ul.nav.navbar-nav
+            li.active
+              a(href="#") Routes
+            li
+              a(href="#") Timetables
+            li
+              a(href="#") RouteFinder
+            li.dropdown
+              a.dropdown-toggle(href="#", data-toggle="dropdown") My Profile
+                b.caret
+              ul.dropdown-menu
+                li
+                  a(href="#") View my profile
+                li
+                  a(href="#") View my routes
+                li.divider
+                li.dropdown-header Settings
+                li
+                  a(href="#") General
+                li
+                  a(href="#") Security
+                li
+                  a(href="#") Log out
+
     block content
