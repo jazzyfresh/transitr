@@ -1,0 +1,21 @@
+extends layout
+
+block content
+
+  h1= title
+  table.table.table-hover
+    thead
+      tr
+        th Stop
+        th Prediction
+        th
+    tbody
+      - each stop in stops
+        tr
+          th= stop.display_name
+          th
+          th
+            a(href="#")
+
+
+  script(src='/javascripts/table-row-link.js')
