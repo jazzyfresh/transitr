@@ -1,12 +1,26 @@
 var http = require('http');
+var async = require('async');
+var metroAPI = "http://api.metro.net/agencies/lametro";
 
 RouteProvider = function () {};
 RouteProvider.prototype.routes = [];
 
+function updatePredictions(routeId, stops) {
+  var i,
+      stop,
+      totalStops = stops.length,
+      metroStopAPI = metroAPI + "/stops/";
+  for (i = 0; i < totalStops; i++) {
+    stop = stops[i];
+  }
+}
+
+
 RouteProvider.prototype.findAll = function (callback) {
   if (this.routes.length === 0) {
-    var routeData = "";
-    http.get("http://api.metro.net/agencies/lametro/routes/", function (res) {
+    var routeData = "",
+        metroRouteAPI = metroAPI + "/routes/";
+    http.get(metroRouteAPI, function (res) {
       res.on('data', function (chunk) {
         routeData += chunk;
       });
@@ -23,12 +37,13 @@ RouteProvider.prototype.findAll = function (callback) {
   }
 };
 
-RouteProvider.prototype.findById = function(id, callback) {
+RouteProvider.prototype.findById = function(routeId, callback) {
   var i,
+      stops,
       routeResult,
       totalRoutes = this.routes.length,
       routeStopData = "",
-      routeStopRequest = "http://api.metro.net/agencies/lametro/routes/" + id + "/stops/";
+      routeStopRequest = metroAPI + "/routes/" + routeId + "/stops/";
   for (i = 0; i < totalRoutes; i++) {
     if (this.routes[i].id === id) {
       routeResult = this.routes[i];
@@ -40,8 +55,8 @@ RouteProvider.prototype.findById = function(id, callback) {
       routeStopData += chunk;
     });
     res.on('end', function () {
-      var stops = JSON.parse(routeStopData).items;
-      routeResult["stops"] = stops;
+      stops = JSON.parse(routeStopData).items;
+      routeResult["stops"] = updatePredictions(routeId, stops);
       RouteProvider.prototype.routes[i] = routeResult;
       callback(null, routeResult);
     });
