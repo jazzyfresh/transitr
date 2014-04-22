@@ -9,10 +9,23 @@ function updatePredictions(routeId, stops) {
   var i,
       stop,
       totalStops = stops.length,
-      metroStopAPI = metroAPI + "/stops/";
+      metroStopAPI = metroAPI + "/stops/",
+      metroPredictionRequests = [];
   for (i = 0; i < totalStops; i++) {
     stop = stops[i];
+    metroPredictionRequests.push(metroStopAPI + stop.id);
   }
+  async.map(
+      stops,
+      function (stop) {
+        http.get(metroStopAPI + stop.id, function (res) {
+          res.on('data', function (chunk) {
+            route
+
+      },
+      function (err, res) {
+
+      });
 }
 
 
@@ -44,25 +57,32 @@ RouteProvider.prototype.findById = function(routeId, callback) {
       totalRoutes = this.routes.length,
       routeStopData = "",
       routeStopRequest = metroAPI + "/routes/" + routeId + "/stops/";
+
   for (i = 0; i < totalRoutes; i++) {
-    if (this.routes[i].id === id) {
+    if (this.routes[i].id === routeId) {
       routeResult = this.routes[i];
       break;
     }
   }
-  http.get(routeStopRequest, function (res) {
-    res.on('data', function (chunk) {
-      routeStopData += chunk;
+
+  if (routeResult["stops"]) {
+    callback(null, routeResult);
+  } else {
+    http.get(routeStopRequest, function (res) {
+      res.on('data', function (chunk) {
+        routeStopData += chunk;
+      });
+      res.on('end', function () {
+        stops = JSON.parse(routeStopData).items;
+        routeResult["stops"] = stops;
+        // routeResult["stops"] = updatePredictions(routeId, stops);
+        RouteProvider.prototype.routes[i] = routeResult;
+        callback(null, routeResult);
+      });
+    }).on("error", function (err) {
+      console.log("Got error: " + err.message);
     });
-    res.on('end', function () {
-      stops = JSON.parse(routeStopData).items;
-      routeResult["stops"] = updatePredictions(routeId, stops);
-      RouteProvider.prototype.routes[i] = routeResult;
-      callback(null, routeResult);
-    });
-  }).on("error", function (err) {
-    console.log("Got error: " + err.message);
-  });
+  }
 };
 
 exports.RouteProvider = RouteProvider;
