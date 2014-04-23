@@ -31,8 +31,18 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', routes.index);
+// app.get('/', routes.index);
 // app.get('/route/:id', routes.route);
+
+app.get('/', function(req, res){
+  routeProvider.findAll(function (err, docs) {
+    res.render('index', {
+      title: 'Transitr',
+      routes: docs
+    });
+  });
+});
+
 app.get('/route/:id', function(req, res){
   routeProvider.findById(req.params.id, function (err, doc) {
     res.render('route', {
