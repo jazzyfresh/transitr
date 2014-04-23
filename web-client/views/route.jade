@@ -13,7 +13,7 @@ block content
       - each stop in stops
         tr
           th= stop.display_name
-          th
+          th= stop.prediction.minutes + ":" stop.prediction.seconds;
           th
             a(href="#")
 

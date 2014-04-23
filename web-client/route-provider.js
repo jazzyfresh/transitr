@@ -5,45 +5,61 @@ var metroAPI = "http://api.metro.net/agencies/lametro";
 RouteProvider = function () {};
 RouteProvider.prototype.routes = [];
 
-function updatePredictions(routeId, stops) {
+function httpRequest(request, callback) {
+  var data = "";
+  http.get(request, function (res) {
+    res.on('data', function (chunk) {
+      data += chunk;
+    });
+    res.on('end', function () {
+      callback(data);
+    }).on('error', function (err) {
+      console.log("Error: " + err.message);
+    });
+  });
+}
+
+function updatePredictions(routeId, stops, callback) {
   var i,
       stop,
+      stopsWithPredictions = [],
       totalStops = stops.length,
+      metroPredictionRequest,
+      metroPredictionRequests = [],
       metroStopAPI = metroAPI + "/stops/",
-      metroPredictionRequests = [];
+      completedRequests = 0;
   for (i = 0; i < totalStops; i++) {
     stop = stops[i];
-    metroPredictionRequests.push(metroStopAPI + stop.id);
+    metroPredictionRequest = metroStopAPI + stop.id + "/predictions/";
   }
-  async.map(
-      stops,
-      function (stop) {
-        http.get(metroStopAPI + stop.id, function (res) {
-          res.on('data', function (chunk) {
-            route
-
-      },
-      function (err, res) {
-
-      });
+  for (r in metroPredictionRequests) {
+    httpRequest(metroPredictionRequests[r], function (data) {
+      var stopWithPrediction = stop,
+          predictions = JSON.parse(data).items;
+      console.log(data);
+      for (p in predictions) {
+        if (predictions[p].route_id === stopWithPrediction.id) {
+          stopWithPrediction["prediction"] = predictions[p];
+          break;
+        }
+      }
+      stopsWithPredictions.push(stopWithPrediction);
+      completedRequests += 1;
+      if (completedRequests === totalStops) {
+        callback(stopsWithPredictions);
+      }
+    });
+  }
 }
 
 
 RouteProvider.prototype.findAll = function (callback) {
   if (this.routes.length === 0) {
-    var routeData = "",
-        metroRouteAPI = metroAPI + "/routes/";
-    http.get(metroRouteAPI, function (res) {
-      res.on('data', function (chunk) {
-        routeData += chunk;
-      });
-      res.on('end', function () {
-        var routes = JSON.parse(routeData).items;
+    var routeRequest = metroAPI + "/routes/";
+    httpRequest(routeRequest, function (data) {
+        var routes = JSON.parse(data).items;
         RouteProvider.prototype.routes = routes;
         callback(null, routes);
-      });
-    }).on("error", function (err) {
-      console.log("Got error: " + err.message);
     });
   } else {
     callback(null, this.routes);
@@ -55,7 +71,6 @@ RouteProvider.prototype.findById = function(routeId, callback) {
       stops,
       routeResult,
       totalRoutes = this.routes.length,
-      routeStopData = "",
       routeStopRequest = metroAPI + "/routes/" + routeId + "/stops/";
 
   for (i = 0; i < totalRoutes; i++) {
@@ -68,19 +83,16 @@ RouteProvider.prototype.findById = function(routeId, callback) {
   if (routeResult["stops"]) {
     callback(null, routeResult);
   } else {
-    http.get(routeStopRequest, function (res) {
-      res.on('data', function (chunk) {
-        routeStopData += chunk;
-      });
-      res.on('end', function () {
-        stops = JSON.parse(routeStopData).items;
-        routeResult["stops"] = stops;
-        // routeResult["stops"] = updatePredictions(routeId, stops);
-        RouteProvider.prototype.routes[i] = routeResult;
-        callback(null, routeResult);
-      });
-    }).on("error", function (err) {
-      console.log("Got error: " + err.message);
+    httpRequest(routeStopRequest, function (data) {
+      stops = JSON.parse(data).items;
+      updatePredictions(
+        routeId,
+        stops,
+        function (modifiedStops) {
+          routeResult["stops"] = modifiedStops || stops;
+          RouteProvider.prototype.routes[i] = routeResult;
+          callback(null, routeResult);
+        });
     });
   }
 };
