@@ -25,23 +25,6 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.get('/', function(req, res) {
-  var date = new Date();
-
-  client.query('INSERT INTO visits(date) VALUES($1)', [date]);
-
-  query = client.query('SELECT COUNT(date) AS count FROM visits WHERE date = $1', [date]);
-  query.on('row', function(result) {
-    console.log(result);
-
-    if (!result) {
-      return res.send('No data found');
-    } else {
-      res.send('Visits today: ' + result.count);
-    }
-  });
-});
-
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
