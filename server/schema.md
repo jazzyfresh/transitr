@@ -27,3 +27,6 @@
   stop_id: int
   text: String
   date_time: Datetime
+
+###Photo
+
