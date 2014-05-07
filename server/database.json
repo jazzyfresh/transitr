@@ -1,0 +1,7 @@
+{
+
+  "dev": "postgres://localhost:5432/transitr",
+
+  "prod": { "ENV": "DATABASE_URL" }
+
+}
