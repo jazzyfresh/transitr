@@ -1,8 +1,19 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+h1 {
+  padding: 10px;
 }
 
 tr.hover {
    cursor: pointer;
+}
+
+#prediction-arrival-soon {
+  background-color: #C9FFB7;
+}
+
+#prediction-arrival-late {
+  background-color: #FFA491;
 }

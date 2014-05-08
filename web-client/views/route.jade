@@ -3,19 +3,33 @@ extends layout
 block content
 
   h1= title
-  table.table.table-hover
-    thead
-      tr
-        th Stop
-        th Prediction
-        th
-    tbody
-      - each stop in stops
-        tr
-          th= stop.display_name
-          th= stop.prediction.minutes + ":" stop.prediction.seconds;
-          th
-            a(href="#")
+  div.col-md-4
+    div.table-reponsive
+      table.table.table-hover
+        thead
+          tr
+            th Stop
+            th
+        tbody
+          - each stop in stops
+            tr.tr-clickable.stop-row(stop-id=stop.id, route-id=route.id, stop-name=stop.display_name)
+              th= stop.display_name
+              th
+
+  div.col-md-8
+    #prediction-arrival-soon.jumbotron
+      h2.stop-heading.bold
+      h2 Your bus will arrive in
+      h1.prediction
+      p.
+        Don't worry, you've got plenty of time :)
+    #prediction-arrival-late.jumbotron
+      h2.stop-heading.bold
+      h2 Your bus will arrive in
+      h1.prediction
+      p.
+        Better hurry! Your bus is on its way.
 
 
   script(src='/javascripts/table-row-link.js')
+  script(src='/javascripts/route.js')
