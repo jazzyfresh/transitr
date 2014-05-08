@@ -8,8 +8,8 @@ var routes = require('./routes');
 var http = require('http');
 var path = require('path');
 
-var RouteProvider = require('./route-provider').RouteProvider;
-var routeProvider = new RouteProvider();
+var Route = require("./lib/metro-data").Route;
+var route = new Route();
 
 
 var app = express();
@@ -35,7 +35,7 @@ if ('development' == app.get('env')) {
 // app.get('/route/:id', routes.route);
 
 app.get('/', function(req, res){
-  routeProvider.findAll(function (err, docs) {
+  route.findAll(function (err, docs) {
     res.render('index', {
       title: 'Transitr',
       routes: docs
@@ -44,7 +44,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/route/:id', function(req, res){
-  routeProvider.findById(req.params.id, function (err, doc) {
+  route.findById(req.params.id, function (err, doc) {
     res.render('route', {
       route: doc,
       title: doc.display_name,
