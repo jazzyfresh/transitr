@@ -1,4 +1,4 @@
-var async = require("async"),
+var http = require("http"),
     routes = [];
 
 function getAllRoutes (callback) {
@@ -9,6 +9,11 @@ function getAllRoutes (callback) {
     });
     res.on('end', function () {
       routes = massageRouteData(routeData);
+      if (routes.length === 0) {
+        console.log("No massaged routes...");
+      } else {
+        console.log("First massaged route: " + routes[0].display_name);
+      }
       callback(null, routes);
     });
   }).on("error", function (err) {
@@ -17,13 +22,14 @@ function getAllRoutes (callback) {
 };
 
 function massageRouteData (rawRouteData) {
-  var rawRoutes = JSON.parse(routeData).items,
+  var rawRoutes,
       massagedRoutes;
-  massagedRoutes = async.map(
-    rawRoutes,
-    massageRoute,
-    function (err, res) { }
-  );
+  if (rawRouteData) {
+    rawRoutes = JSON.parse(rawRouteData).items;
+    massagedRoutes = rawRoutes.map(massageRoute);
+  } else {
+    massagedRoutes = [];
+  }
   return massagedRoutes;
 };
 
